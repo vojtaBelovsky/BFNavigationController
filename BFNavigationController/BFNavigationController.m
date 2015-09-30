@@ -261,20 +261,22 @@ static const CGFloat kPushPopAnimationDuration = 0.2;
 
 - (NSArray *)popToRootViewControllerAnimated:(BOOL)animated {
     // Don't pop last controller
-    if ([_viewControllers count] == 1) {
+    if([_viewControllers count] == 1)
         return [NSArray array];
-    }
     
-    NSViewController *rootController = [_viewControllers objectAtIndex:0];
+    NSViewController *rootController = [_viewControllers objectAtIndex: 0];
     [_viewControllers removeObject: rootController];
     
-    NSRange poppedRange = NSMakeRange(1, [_viewControllers count] - 1);
-    NSArray *dispControllers = [_viewControllers subarrayWithRange:poppedRange];
-
-    _viewControllers = [NSMutableArray arrayWithObject:rootController];
+    // rearange popped controllers - like if you pop them one by one
+    NSMutableArray *dispControllers = [NSMutableArray new];
+    for ( id controller in self.viewControllers ) {
+        [dispControllers insertObject:controller atIndex:0];
+    }
+    
+    _viewControllers = [NSMutableArray arrayWithObject: rootController];
     
     // Navigate
-    [self _navigateFromViewController: [dispControllers lastObject] toViewController:rootController animated:animated push:NO];
+    [self _navigateFromViewController: [dispControllers firstObject] toViewController: rootController animated: animated push: NO];
 
     for (NSViewController * aViewController in dispControllers) {
         if ([aViewController respondsToSelector:@selector(setNavigationController:)]) {
